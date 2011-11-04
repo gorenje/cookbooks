@@ -13,7 +13,7 @@ user "ntp" do
 end
 
 file "/etc/ntpd.conf" do
-  content "server #{node[:ntp][:server]}\n"
+  content node[:ntp][:server].split(/,/).collect { |a| "server #{a}" }.join("\n") + "\n"
   owner "root"
   group "root"
   mode "0644"
@@ -44,7 +44,7 @@ service "ntpd" do
 end
 
 nrpe_command "check_time" do
-  command "/usr/lib/nagios/plugins/check_ntp_time -H ptbtime1.ptb.de"
+  command "/usr/lib/nagios/plugins/check_ntp_time -H #{node[:ntp][:server].split(/,/).first}"
 end
 
 nagios_service "TIME" do
